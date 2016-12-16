@@ -1,0 +1,56 @@
+<!-- This is a static file -->
+<!-- served from your routes in server.js -->
+
+<!-- You might want to try something fancier: -->
+<!-- html/nunjucks docs: http://mozilla.github.io/nunjucks/ -->
+<!-- jade: http://jade-lang.com/ -->
+<!-- haml: http://haml.info/tutorial.html -->
+<!-- hbs(handlebars): http://handlebarsjs.com/expressions.html -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to HyperDev!</title>
+    <meta name="description" content="A cool thing made with HyperDev">
+    <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <header>
+      <h1>
+        Confederation ID
+      </h1>
+    </header>
+
+    <main>
+      <p class="bold">Oh hi,</p>
+      <p>
+        Status: <strong><span id="status"></span></strong>
+      </p>
+      
+      <div id="step-1" class="step">
+        <p>Tell me your E-Mail Addres:</p>
+        <form id="loginForm">
+          <input id="email" value="flasnia@googlemail.com" type="email" maxlength="100" placeholder="email@address.com">
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+      
+      <div id="step-2" class="step">
+        <p>Tell me your Code</p>
+        <form id="challengeForm">
+          <input id="secret" type="text" maxlength="4" placeholder="XXXX">
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+      
+    </main>
+
+     <script src="/reqwest.min.js"></script>        
+    <script src="/client.js"></script>
+
+  </body>
+</html>
