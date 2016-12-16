@@ -3,6 +3,12 @@ var constant = {
   endpoint: 'https://confederation-id.me:8443/id/auth'
 };
 
+reqwest.ajaxSetup({
+  type: 'json',
+  contentType: 'application/json',
+  crossOrigin: true
+});
+
 
 var $status = document.getElementById('status');
 var $loginForm = document.getElementById('loginForm');
@@ -10,6 +16,7 @@ var $challengeForm = document.getElementById('challengeForm');
 var $email = document.getElementById('email');
 var $secret = document.getElementById('secret');
 var $reset =  document.getElementById('reset');
+var $signout =  document.getElementById('signout');
 
 function setStatus(text){
   $status.innerHTML = text;
@@ -21,10 +28,12 @@ function go2step(id){
     console.log(elem);
     elem.style.display = 'none';
   });
-  document.getElementById('step-' + id).style.display = 'block';
+  try {
+    document.getElementById('step-' + id).style.display = 'block';
+  } catch(e){}
 }
+go2step(0);
 
-go2step(1);
 
 setStatus('Initializing...');
 
@@ -44,8 +53,8 @@ $loginForm.onsubmit=function(event){
     
     reqwest({
         url: constant.endpoint
-      , type: 'json'
-      , contentType: 'application/json'
+      //, type: 'json'
+      //, contentType: 'application/json'
       , crossOrigin: true        
       , method: 'get'
       , data: {identifier: email}
@@ -74,19 +83,19 @@ $challengeForm.onsubmit=function(event){
     
     var r = reqwest({
         url: constant.endpoint
-      , type: 'json'
-      , contentType: 'application/json'
+      //, type: 'json'
+      //, contentType: 'application/json'
       , crossOrigin: true        
       , method: 'post'
       , data: JSON.stringify(global)
       , success: function (resp) {
          console.log('Success', resp);
          global.roles = resp;
-         setStatus('Secret Response available: ' + resp);
          global.token = r.request.getResponseHeader('Authentication');
+         setStatus('Secret Response available: ' + global.token.length + ' chars');
          localStorage.setItem('Authentication', global.token);
          localStorage.setItem('identifier', global.identifier);
-
+         go2step(3);
         }
       , error: function(err){
         setStatus('No secret response');
@@ -108,10 +117,8 @@ function checkStatus(){
   var token = localStorage.getItem('Authentication');
   var identifier = localStorage.getItem('identifier');
   if (token && identifier){
-    reqwest({
+    var r = reqwest({
         url: constant.endpoint
-      , type: 'json'
-      , contentType: 'application/json'
       , crossOrigin: true        
       , method: 'get'
       , headers: {
@@ -120,14 +127,24 @@ function checkStatus(){
       , data: {identifier: identifier}
       , success: function (resp) {
          console.log('Success', resp);
+         go2step(3);
          setStatus('Signed in');
         }
       , error: function(err){
         setStatus('Not signed in');
+        go2step(1);
         console.log('err',err);
       }
     });
+  } else {
+    go2step(1);h
   }
+}
+
+function signOut(){
+ localStorage.removeItem('Authentication');
+ localStorage.removeItem('identifier');  
+ go2step(1);
 }
 
 checkStatus();
@@ -135,6 +152,11 @@ checkStatus();
 $reset.onclick = function(event){
   global = {};
   go2step(1);
+};
+
+
+$signout.onclick = function(event){
+  signOut();
 };
   
   
