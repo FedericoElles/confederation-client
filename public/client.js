@@ -9,7 +9,7 @@ var $loginForm = document.getElementById('loginForm');
 var $challengeForm = document.getElementById('challengeForm');
 var $email = document.getElementById('email');
 var $secret = document.getElementById('secret');
-
+var $reset =  document.getElementById('reset');
 
 function setStatus(text){
   $status.innerHTML = text;
@@ -55,6 +55,10 @@ $loginForm.onsubmit=function(event){
          global.challengeID = resp;
          setStatus('Response available: ' + resp);
         }
+      , error: function(err){
+        setStatus('No response');
+        console.log('err',err);
+      }
     });
     
   }
@@ -68,7 +72,7 @@ $challengeForm.onsubmit=function(event){
   if (global.secret){
     setStatus('Posting secret to auth server...');
     
-    reqwest({
+    var r = reqwest({
         url: constant.endpoint
       , type: 'json'
       , contentType: 'application/json'
@@ -79,9 +83,58 @@ $challengeForm.onsubmit=function(event){
          console.log('Success', resp);
          global.roles = resp;
          setStatus('Secret Response available: ' + resp);
+         global.token = r.request.getResponseHeader('Authentication');
+         localStorage.setItem('Authentication', global.token);
+         localStorage.setItem('identifier', global.identifier);
+
         }
+      , error: function(err){
+        setStatus('No secret response');
+        console.log('err secret',err);
+      }
+    });//.then(function(resp){
+    //  console.log('resp',resp,r);
+    //  console.log('Authentication', r.request.getResponseHeader('Authentication'));
+    //}).fail(function (err, msg) {
+    //  debugger;
+    //})
+    //.always(function (resp) {
+    //  console.log('always', resp);
+    //});
+  }
+};
+
+function checkStatus(){
+  var token = localStorage.getItem('Authentication');
+  var identifier = localStorage.getItem('identifier');
+  if (token && identifier){
+    reqwest({
+        url: constant.endpoint
+      , type: 'json'
+      , contentType: 'application/json'
+      , crossOrigin: true        
+      , method: 'get'
+      , headers: {
+        'Authentication': token
+      }
+      , data: {identifier: identifier}
+      , success: function (resp) {
+         console.log('Success', resp);
+         setStatus('Signed in');
+        }
+      , error: function(err){
+        setStatus('Not signed in');
+        console.log('err',err);
+      }
     });
   }
 }
+
+checkStatus();
+
+$reset.onclick = function(event){
+  global = {};
+  go2step(1);
+};
   
   
