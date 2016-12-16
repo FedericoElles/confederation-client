@@ -25,7 +25,6 @@ function setStatus(text){
 
 function go2step(id){
   Array.prototype.slice.call(document.getElementsByClassName('step')).forEach(function(elem){
-    console.log(elem);
     elem.style.display = 'none';
   });
   try {
@@ -93,9 +92,7 @@ $challengeForm.onsubmit=function(event){
          global.roles = resp;
          global.token = r.request.getResponseHeader('Authentication');
          setStatus('Secret Response available: ' + global.token.length + ' chars');
-         localStorage.setItem('Authentication', global.token);
-         localStorage.setItem('identifier', global.identifier);
-         go2step(3);
+         getDeviceToken();
         }
       , error: function(err){
         setStatus('No secret response');
@@ -112,6 +109,33 @@ $challengeForm.onsubmit=function(event){
     //});
   }
 };
+
+function getDeviceToken(){
+ var r = reqwest({
+        url: constant.endpoint
+      , crossOrigin: true        
+      , method: 'get'
+      , headers: {
+        'Authentication': global.token
+      }
+      , data: {
+        'identifier': global.identifier,
+        'setDeviceToken': true
+      }
+      , success: function (resp) {
+         console.log('Updating token', resp);
+         global.token = r.request.getResponseHeader('Authentication');
+         localStorage.setItem('Authentication', global.token);
+         localStorage.setItem('identifier', global.identifier);
+         go2step(3);
+        }
+      , error: function(err){
+        setStatus('Not signed in');
+        go2step(1);
+        console.log('err',err);
+      }
+    });
+}
 
 function checkStatus(){
   var token = localStorage.getItem('Authentication');
@@ -137,7 +161,7 @@ function checkStatus(){
       }
     });
   } else {
-    go2step(1);h
+    go2step(1);
   }
 }
 
