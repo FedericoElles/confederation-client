@@ -77,6 +77,7 @@ $challengeForm.onsubmit=function(event){
   event.preventDefault();
   setStatus('Secret Form clicked');
   global.secret = ($secret.value).toUpperCase();
+  $secret.value = '';
   if (global.secret){
     setStatus('Posting secret to auth server...');
     
